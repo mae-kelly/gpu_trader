@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GPU Swarm Trader
 
-## Getting Started
+A high-frequency cryptocurrency trading dashboard powered by GPU clusters on Google Colab with a cyberpunk-themed Vercel frontend.
 
-First, run the development server:
+## 🚀 Features
 
+- **GPU-Powered Scanning**: Parallel processing of thousands of tokens per second
+- **Real-Time Momentum Detection**: Identifies coins gaining 9-13% in rolling time windows
+- **Smart Contract Analysis**: Honeypot detection and safety verification
+- **Cyberpunk UI**: Futuristic dark theme with neon glow effects
+- **Trading Simulation**: Risk-free testing before live deployment
+- **Auto-Trading**: Autonomous swarm trading with exit strategies
+
+## 🏗️ Architecture
+
+- **Frontend**: Next.js 14 + TypeScript + Tailwind CSS (Vercel)
+- **Backend**: Python + FastAPI (Google Colab GPU)
+- **State Management**: Zustand
+- **Charts**: Recharts
+- **Styling**: Custom cyberpunk theme with neon effects
+
+## 🔧 Installation
+
+1. Run the setup scripts in order:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+chmod +x *.sh
+./setup-project.sh
+./create-components.sh  
+./create-dashboard.sh
+./create-pages.sh
+./finalize-app.sh
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Start development server:
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Open [http://localhost:3000](http://localhost:3000)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎯 Core Strategy
 
-## Learn More
+The system implements rotational compounding by:
+- Scanning all tokens for 9-13% momentum windows
+- Executing micro-trades ($0.10-$1) across thousands of assets
+- Monitoring acceleration (second-derivative price movement)
+- Exiting immediately when momentum slows
+- Reinvesting profits into new opportunities
 
-To learn more about Next.js, take a look at the following resources:
+## ⚠️ Risk Warning
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+High-frequency trading involves significant financial risk. This software is for educational purposes and simulation. Always test thoroughly before live trading.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Deployment
 
-## Deploy on Vercel
+- Frontend: Deploy to Vercel
+- Backend: Run on Google Colab with GPU runtime
+- Connect via API endpoints for real-time data flow
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📊 Dashboard Components
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Momentum Scanner**: Live feed of qualifying tokens
+- **GPU Cluster Status**: Real-time processing metrics  
+- **Wallet Simulation**: Virtual trading with ROI tracking
+- **Contract Analysis**: Security and honeypot checks
+- **Trading Controls**: Auto-trade settings and filters
+
+Built for the future of algorithmic trading. 🚀

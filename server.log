@@ -1,0 +1,15 @@
+
+> crypto-trading-dashboard@0.1.0 dev
+> next dev
+
+   ▲ Next.js 14.0.4
+   - Local:        http://localhost:3000
+   - Environments: .env.local
+
+ ✓ Ready in 1130ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1847ms (492 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ✓ Compiled in 191ms (236 modules)
+[?25h
