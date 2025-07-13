@@ -1,12 +1,9 @@
 "use client"
-
 import { Line, LineChart, ResponsiveContainer } from "recharts"
-
 interface MiniChartProps {
   data: Array<{ value: number }>
   color?: string
 }
-
 export function MiniChart({ data, color = "#10b981" }: MiniChartProps) {
   return (
     <ResponsiveContainer width="100%" height="100%">

@@ -1,146 +1,49 @@
-import { useEffect, useMemo } from 'react'
-import { FixedSizeList } from 'react-window'
+"use client"
+
+import { useEffect, useState } from 'react'
 import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useRealtimeStore } from '@/lib/realtime-store'
-import { TrendingUp, TrendingDown, Activity, Zap } from 'lucide-react'
+import { TrendingUp, TrendingDown } from 'lucide-react'
 import { formatCurrency, formatPercentage } from '@/lib/utils'
-
-interface TokenRowProps {
-  index: number
-  style: React.CSSProperties
-  data: any[]
-}
-
-const TokenRow = ({ index, style, data }: TokenRowProps) => {
-  const token = data[index]
-  if (!token) return null
-
-  const { acceleration, honeypot } = token
-  
-  const getAccelerationColor = (acc: number) => {
-    if (acc > 0.1) return 'text-green-400'
-    if (acc < -0.1) return 'text-red-400'
-    return 'text-yellow-400'
-  }
-
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case 'low': return 'text-green-400'
-      case 'medium': return 'text-yellow-400'
-      case 'high': return 'text-orange-400'
-      case 'critical': return 'text-red-400'
-      default: return 'text-gray-400'
-    }
-  }
-
-  return (
-    <div style={style} className="flex items-center px-4 py-2 border-b border-gray-800 hover:bg-gray-900/50">
-      <div className="flex-1 grid grid-cols-9 gap-3 items-center text-sm">
-        
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
-            {token.symbol.slice(0, 2)}
-          </div>
-          <div>
-            <div className="font-medium text-white">{token.symbol}</div>
-            <div className="text-xs text-gray-400">{token.chain.toUpperCase()}</div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1">
-          {token.priceChange24h > 0 ? (
-            <TrendingUp className="w-3 h-3 text-green-400" />
-          ) : (
-            <TrendingDown className="w-3 h-3 text-red-400" />
-          )}
-          <span className={token.priceChange24h > 0 ? 'text-green-400' : 'text-red-400'}>
-            {formatPercentage(token.priceChange24h)}
-          </span>
-        </div>
-
-        <div className="font-mono text-white">
-          {formatCurrency(token.price, 6)}
-        </div>
-
-        <div className="text-white">
-          {formatCurrency(token.volume24h)}
-        </div>
-
-        <div className="text-white">
-          {formatCurrency(token.liquidity)}
-        </div>
-
-        <div className="flex items-center gap-1">
-          <Activity className="w-3 h-3 text-blue-400" />
-          <span className={getAccelerationColor(acceleration.acceleration)}>
-            {acceleration.acceleration.toFixed(4)}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-1">
-          <Zap className="w-3 h-3 text-yellow-400" />
-          <span className="text-white">
-            {acceleration.momentum.toFixed(2)}
-          </span>
-        </div>
-
-        <Badge 
-          variant={honeypot.isHoneypot ? 'destructive' : 'default'}
-          className={`text-xs ${getRiskColor(honeypot.riskLevel)}`}
-        >
-          {honeypot.riskLevel}
-        </Badge>
-
-        <div className="flex gap-1">
-          <Button size="sm" className="px-2 py-1 text-xs bg-green-600 hover:bg-green-700">
-            Buy
-          </Button>
-          <Button size="sm" variant="outline" className="px-2 py-1 text-xs">
-            Sell
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 export default function RealtimeMomentumTable() {
   const { 
-    getFilteredTokens, 
-    startRealTimeScanning, 
+    tokens,
     isConnected, 
     lastUpdate,
     totalScanned,
-    getTokenWithMetrics 
+    updateTrigger,
+    startRealTimeScanning,
+    getFilteredTokens
   } = useRealtimeStore()
 
+  // Force re-render when updateTrigger changes
+  const [renderKey, setRenderKey] = useState(0)
+
   useEffect(() => {
+    console.log('🚀 Table component mounted')
     startRealTimeScanning()
   }, [startRealTimeScanning])
 
-  const tokens = useMemo(() => {
-    const filtered = getFilteredTokens({
-      chains: ['ethereum', 'bsc', 'arbitrum', 'polygon'],
-      minVolume: 10000,
-      minLiquidity: 50000,
-      excludeHoneypots: false
-    })
-    
-    return filtered.map(token => getTokenWithMetrics(token.address)).filter(Boolean)
-  }, [getFilteredTokens, getTokenWithMetrics, lastUpdate])
+  // Update render key when store updates
+  useEffect(() => {
+    setRenderKey(prev => prev + 1)
+    console.log('🔄 Store updated, forcing re-render')
+  }, [updateTrigger, tokens, lastUpdate])
 
-  const sortedTokens = useMemo(() => {
-    return tokens.sort((a, b) => {
-      const aAccel = a?.acceleration?.acceleration || 0
-      const bAccel = b?.acceleration?.acceleration || 0
-      return bAccel - aAccel
-    })
-  }, [tokens])
+  const filteredTokens = getFilteredTokens()
+
+  console.log('🎨 Table render:', {
+    renderKey,
+    isConnected,
+    totalTokens: tokens.length,
+    filteredTokens: filteredTokens.length,
+    lastUpdate: new Date(lastUpdate).toLocaleTimeString()
+  })
 
   return (
-    <Card className="bg-black border-gray-800">
+    <Card className="bg-black border-gray-800" key={renderKey}>
       <div className="p-4 border-b border-gray-800">
         <div className="flex items-center justify-between">
           <div>
@@ -148,7 +51,7 @@ export default function RealtimeMomentumTable() {
               Real-Time Momentum Scanner
             </h2>
             <p className="text-sm text-gray-400">
-              Live tracking of all tokens with 9-13% gains • {tokens.length} active
+              Live tracking • {filteredTokens.length} tokens in 9-13% range • {tokens.length} total • Render: {renderKey}
             </p>
           </div>
           <div className="flex items-center gap-4">
@@ -159,35 +62,98 @@ export default function RealtimeMomentumTable() {
               </span>
             </div>
             <div className="text-xs text-gray-400">
-              Scanned: {totalScanned.toLocaleString()}
+              Last: {lastUpdate ? new Date(lastUpdate).toLocaleTimeString() : 'Never'}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="p-4 border-b border-gray-800 bg-gray-900/20">
-        <div className="grid grid-cols-9 gap-3 text-xs font-medium text-gray-400">
-          <div>Token</div>
-          <div>Change</div>
-          <div>Price</div>
-          <div>Volume</div>
-          <div>Liquidity</div>
-          <div>Acceleration</div>
-          <div>Momentum</div>
-          <div>Risk</div>
-          <div>Actions</div>
-        </div>
+      <div className="overflow-x-auto">
+        {filteredTokens.length === 0 ? (
+          <div className="p-8 text-center text-gray-400">
+            <div className="text-lg mb-2">
+              {isConnected ? 'Scanning for real tokens...' : 'Connecting...'}
+            </div>
+            <div className="text-sm">
+              {isConnected ? 
+                `Scanner active • ${tokens.length} tokens tracked • Looking for 9-13% gains` : 
+                'Waiting for WebSocket connection...'
+              }
+            </div>
+            <div className="text-xs mt-2 text-yellow-400">
+              Render key: {renderKey} • Update trigger: {updateTrigger}
+            </div>
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-800 bg-gray-900/20">
+                <th className="text-left p-3 text-xs font-medium text-gray-400">Token</th>
+                <th className="text-left p-3 text-xs font-medium text-gray-400">Change</th>
+                <th className="text-left p-3 text-xs font-medium text-gray-400">Price</th>
+                <th className="text-left p-3 text-xs font-medium text-gray-400">Volume</th>
+                <th className="text-left p-3 text-xs font-medium text-gray-400">Chain</th>
+                <th className="text-left p-3 text-xs font-medium text-gray-400">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTokens.map((token, index) => (
+                <tr key={`${token.chain}-${token.address}-${index}-${renderKey}`} className="border-b border-gray-800 hover:bg-gray-900/50">
+                  <td className="p-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+                        {token.symbol.slice(0, 2)}
+                      </div>
+                      <div>
+                        <div className="font-medium text-white">{token.symbol}</div>
+                        <div className="text-xs text-gray-400">{token.name}</div>
+                      </div>
+                    </div>
+                  </td>
+                  
+                  <td className="p-3">
+                    <div className="flex items-center gap-1">
+                      {token.priceChange24h > 0 ? (
+                        <TrendingUp className="w-3 h-3 text-green-400" />
+                      ) : (
+                        <TrendingDown className="w-3 h-3 text-red-400" />
+                      )}
+                      <span className={`font-semibold ${token.priceChange24h > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        {formatPercentage(token.priceChange24h)}
+                      </span>
+                    </div>
+                  </td>
+                  
+                  <td className="p-3 font-mono text-sm text-white">
+                    {formatCurrency(token.price, 6)}
+                  </td>
+                  
+                  <td className="p-3 text-white">
+                    {formatCurrency(token.volume24h)}
+                  </td>
+                  
+                  <td className="p-3">
+                    <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs">
+                      {token.chain}
+                    </span>
+                  </td>
+                  
+                  <td className="p-3">
+                    <div className="flex gap-1">
+                      <Button size="sm" className="px-2 py-1 text-xs bg-green-600 hover:bg-green-700">
+                        Buy
+                      </Button>
+                      <Button size="sm" variant="outline" className="px-2 py-1 text-xs">
+                        Sell
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
-
-      <FixedSizeList
-        height={600}
-        itemCount={sortedTokens.length}
-        itemSize={60}
-        itemData={sortedTokens}
-        width="100%"
-      >
-        {TokenRow}
-      </FixedSizeList>
     </Card>
   )
 }

@@ -1,24 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: false,
+  reactStrictMode: true,
+  swcMinify: true,
+  env: {
+    CUSTOM_KEY: process.env.NODE_ENV || 'development',
+    BIRDEYE_API_KEY: process.env.BIRDEYE_API_KEY || ''
   },
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
-  // Enable API routes
-  async headers() {
-    return [
-      {
-        source: '/api/:path*',
-        headers: [
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
-          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
-        ],
-      },
-    ]
-  },
+  images: {
+    domains: ['api.dexscreener.com']
+  }
 }
-
 module.exports = nextConfig

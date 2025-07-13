@@ -1,203 +1,92 @@
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-import { TokenData, DexAggregator } from './data-sources/dex-aggregator'
-import { HoneypotDetector, HoneypotResult } from './honeypot-detector'
-import { realtimeService, RealtimeUpdate } from './realtime-service'
-import { accelerationCalculator, AccelerationData } from './acceleration-calculator'
 
-interface RealtimeState {
-  tokens: Map<string, TokenData>
-  honeypotResults: Map<string, HoneypotResult>
-  accelerationData: Map<string, AccelerationData>
-  isConnected: boolean
-  lastUpdate: number
-  scanningStatus: 'idle' | 'scanning' | 'error'
-  totalScanned: number
-  
-  startRealTimeScanning: () => void
-  stopRealTimeScanning: () => void
-  updateToken: (token: TokenData) => void
-  setHoneypotResult: (address: string, result: HoneypotResult) => void
-  getFilteredTokens: (filters: any) => TokenData[]
-  getTokenWithMetrics: (address: string) => TokenData & { acceleration: AccelerationData; honeypot: HoneypotResult } | null
+interface TokenData {
+  address: string
+  symbol: string
+  name: string
+  price: number
+  priceChange24h: number
+  volume24h: number
+  chain: string
+  timestamp: number
 }
 
-const dexAggregator = new DexAggregator()
-const honeypotDetector = new HoneypotDetector()
+interface RealtimeState {
+  tokens: TokenData[]
+  isConnected: boolean
+  lastUpdate: number
+  updateCount: number
+  startRealTimeScanning: () => void
+  getFilteredTokens: () => TokenData[]
+}
 
 export const useRealtimeStore = create<RealtimeState>()(
   subscribeWithSelector((set, get) => ({
-    tokens: new Map(),
-    honeypotResults: new Map(),
-    accelerationData: new Map(),
+    tokens: [],
     isConnected: false,
     lastUpdate: 0,
-    scanningStatus: 'idle',
-    totalScanned: 0,
+    updateCount: 0,
 
     startRealTimeScanning: () => {
-      set({ scanningStatus: 'scanning' })
+      console.log('🔗 Starting TRUE REAL-TIME WebSocket...')
       
-      realtimeService.connect()
-      
-      realtimeService.addListener((update: RealtimeUpdate) => {
-        const state = get()
-        const tokenKey = `${update.chain}-${update.tokenAddress}`
-        const existingToken = state.tokens.get(tokenKey)
-        
-        if (existingToken) {
-          const updatedToken = {
-            ...existingToken,
-            ...update.data,
-            lastUpdate: update.timestamp
-          }
-          
-          dexAggregator.updatePriceHistory(updatedToken, update.data.price || existingToken.price)
-          
-          const acceleration = accelerationCalculator.calculateRealTimeMetrics(
-            updatedToken.priceHistory,
-            updatedToken.price
-          )
-          
-          set(state => ({
-            tokens: new Map(state.tokens).set(tokenKey, updatedToken),
-            accelerationData: new Map(state.accelerationData).set(tokenKey, acceleration),
-            lastUpdate: Date.now(),
-            totalScanned: state.totalScanned + 1
-          }))
-        }
-      })
-      
-      const scanAllTokens = async () => {
+      const connectWebSocket = () => {
         try {
-          const allTokens = await dexAggregator.fetchAllTokens()
-          const newTokens = new Map<string, TokenData>()
-          const newAccelerationData = new Map<string, AccelerationData>()
+          const ws = new WebSocket('ws://localhost:8080')
           
-          for (const token of allTokens) {
-            const tokenKey = `${token.chain}-${token.address}`
-            newTokens.set(tokenKey, token)
-            
-            const acceleration = accelerationCalculator.calculateRealTimeMetrics(
-              token.priceHistory,
-              token.price
-            )
-            newAccelerationData.set(tokenKey, acceleration)
-            
-            honeypotDetector.checkToken(token.address, token.chain).then(result => {
-              set(state => ({
-                honeypotResults: new Map(state.honeypotResults).set(tokenKey, result)
-              }))
-            })
+          ws.onopen = () => {
+            console.log('✅ REAL-TIME WebSocket connected!')
+            set({ isConnected: true })
+          }
+
+          ws.onmessage = (event) => {
+            try {
+              const message = JSON.parse(event.data)
+              
+              if (message.type === 'realtime_update' && message.data) {
+                const now = Date.now()
+                
+                set(state => ({ 
+                  tokens: [...message.data],
+                  lastUpdate: now,
+                  updateCount: state.updateCount + 1
+                }))
+                
+                // Log only every 10th update to avoid spam
+                if (get().updateCount % 10 === 0) {
+                  console.log(`⚡ LIVE UPDATE #${get().updateCount}: ${message.data.length} tokens`)
+                }
+              }
+            } catch (error) {
+              console.error('❌ Parse error:', error)
+            }
+          }
+
+          ws.onclose = () => {
+            console.log('🔌 REAL-TIME WebSocket closed, reconnecting...')
+            set({ isConnected: false })
+            setTimeout(connectWebSocket, 1000)
+          }
+
+          ws.onerror = (error) => {
+            console.error('❌ REAL-TIME WebSocket error:', error)
           }
           
-          set({
-            tokens: newTokens,
-            accelerationData: newAccelerationData,
-            lastUpdate: Date.now(),
-            isConnected: realtimeService.getConnectionStatus()
-          })
         } catch (error) {
-          console.error('Token scanning failed:', error)
-          set({ scanningStatus: 'error' })
+          console.error('❌ Failed to connect:', error)
+          setTimeout(connectWebSocket, 1000)
         }
       }
-      
-      scanAllTokens()
-      setInterval(scanAllTokens, 5000)
+
+      connectWebSocket()
     },
 
-    stopRealTimeScanning: () => {
-      realtimeService.disconnect()
-      set({ 
-        scanningStatus: 'idle', 
-        isConnected: false 
-      })
-    },
-
-    updateToken: (token: TokenData) => {
-      const tokenKey = `${token.chain}-${token.address}`
-      
-      set(state => {
-        const newTokens = new Map(state.tokens)
-        const existingToken = newTokens.get(tokenKey)
-        
-        if (existingToken) {
-          dexAggregator.updatePriceHistory(existingToken, token.price)
-        }
-        
-        newTokens.set(tokenKey, token)
-        
-        const acceleration = accelerationCalculator.calculateRealTimeMetrics(
-          token.priceHistory,
-          token.price
-        )
-        
-        return {
-          tokens: newTokens,
-          accelerationData: new Map(state.accelerationData).set(tokenKey, acceleration),
-          lastUpdate: Date.now()
-        }
-      })
-    },
-
-    setHoneypotResult: (address: string, result: HoneypotResult) => {
-      set(state => ({
-        honeypotResults: new Map(state.honeypotResults).set(address, result)
-      }))
-    },
-
-    getFilteredTokens: (filters) => {
-      const state = get()
-      const tokens = Array.from(state.tokens.values())
-      
-      return tokens.filter(token => {
-        if (filters.chains && filters.chains.length > 0) {
-          if (!filters.chains.includes(token.chain)) return false
-        }
-        
-        if (filters.minVolume && token.volume24h < filters.minVolume) return false
-        if (filters.minLiquidity && token.liquidity < filters.minLiquidity) return false
-        
-        const change = token.priceChange24h
-        if (change < 9 || change > 13) return false
-        
-        const tokenKey = `${token.chain}-${token.address}`
-        const honeypot = state.honeypotResults.get(tokenKey)
-        if (filters.excludeHoneypots && honeypot?.isHoneypot) return false
-        
-        return true
-      })
-    },
-
-    getTokenWithMetrics: (address: string) => {
-      const state = get()
-      const token = Array.from(state.tokens.values()).find(t => t.address === address)
-      if (!token) return null
-      
-      const tokenKey = `${token.chain}-${token.address}`
-      const acceleration = state.accelerationData.get(tokenKey) || {
-        velocity: 0,
-        acceleration: 0,
-        momentum: 0,
-        trend: 'stable' as const,
-        strength: 0
-      }
-      const honeypot = state.honeypotResults.get(tokenKey) || {
-        isHoneypot: false,
-        riskLevel: 'low' as const,
-        buyTax: 0,
-        sellTax: 0,
-        canSell: true,
-        reasons: [],
-        checkedAt: Date.now()
-      }
-      
-      return {
-        ...token,
-        acceleration,
-        honeypot
-      }
+    getFilteredTokens: () => {
+      const tokens = get().tokens
+      return tokens.filter(token => 
+        token.priceChange24h >= 9 && token.priceChange24h <= 13
+      ).sort((a, b) => b.priceChange24h - a.priceChange24h)
     }
   }))
 )

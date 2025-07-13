@@ -16,13 +16,11 @@ export interface CoinData {
   holders: number
   isTrading: boolean
 }
-
 export interface ChartDataPoint {
   timestamp: number
   price: number
   volume: number
 }
-
 export interface Trade {
   id: string
   coinId: string
@@ -34,7 +32,6 @@ export interface Trade {
   roi: number
   status: 'pending' | 'completed' | 'failed'
 }
-
 export interface WalletData {
   balance: number
   totalInvested: number
@@ -44,13 +41,11 @@ export interface WalletData {
   tradeHistory: Trade[]
   roiGraphData: ROIDataPoint[]
 }
-
 export interface ROIDataPoint {
   timestamp: number
   balance: number
   roi: number
 }
-
 export interface DashboardFilters {
   thresholdPercentage: [number, number]
   timeWindowMinutes: number
@@ -59,7 +54,6 @@ export interface DashboardFilters {
   minimumLiquidity: number
   autoTradeEnabled: boolean
 }
-
 export interface MomentumMetrics {
   coinsInRange: number
   activeTrades: number

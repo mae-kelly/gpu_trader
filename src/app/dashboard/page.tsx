@@ -13,12 +13,11 @@ export default function DashboardPage() {
     lastUpdate, 
     totalScanned,
     tokens,
-    accelerationData
+    updateTrigger,
+    getFilteredTokens
   } = useRealtimeStore()
 
-  const tokensArray = Array.from(tokens.values())
-  const avgAcceleration = Array.from(accelerationData.values())
-    .reduce((sum, acc) => sum + acc.acceleration, 0) / accelerationData.size || 0
+  const filteredTokens = getFilteredTokens()
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -30,13 +29,13 @@ export default function DashboardPage() {
               GPU Swarm Trader
             </h1>
             <p className="text-gray-400">
-              Real-time acceleration tracking • All tokens 9-13% gains
+              Real-time scanning • {filteredTokens.length} tokens in 9-13% range
             </p>
           </div>
           <div className="flex items-center gap-4">
             <Badge variant="outline" className="flex items-center gap-2 border-green-500/20 text-green-400">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              GPU Cluster Online
+              {isConnected ? 'Scanner Online' : 'Scanner Offline'}
             </Badge>
           </div>
         </div>
@@ -45,19 +44,19 @@ export default function DashboardPage() {
           <Card className="bg-gray-900 border-gray-800 p-6">
             <div className="flex items-center gap-3 mb-2">
               <Activity className="w-5 h-5 text-blue-400" />
-              <span className="text-sm text-gray-400">Tokens Tracked</span>
+              <span className="text-sm text-gray-400">Tokens in Range</span>
             </div>
-            <div className="text-2xl font-bold text-white">{tokensArray.length}</div>
-            <div className="text-xs text-green-400">+{totalScanned} scanned</div>
+            <div className="text-2xl font-bold text-white">{filteredTokens.length}</div>
+            <div className="text-xs text-green-400">9-13% gainers</div>
           </Card>
 
           <Card className="bg-gray-900 border-gray-800 p-6">
             <div className="flex items-center gap-3 mb-2">
               <Zap className="w-5 h-5 text-yellow-400" />
-              <span className="text-sm text-gray-400">Avg Acceleration</span>
+              <span className="text-sm text-gray-400">Total Tracked</span>
             </div>
-            <div className="text-2xl font-bold text-white">{avgAcceleration.toFixed(4)}</div>
-            <div className="text-xs text-yellow-400">Real-time</div>
+            <div className="text-2xl font-bold text-white">{tokens.length}</div>
+            <div className="text-xs text-yellow-400">All tokens</div>
           </Card>
 
           <Card className="bg-gray-900 border-gray-800 p-6">
@@ -76,12 +75,12 @@ export default function DashboardPage() {
           <Card className="bg-gray-900 border-gray-800 p-6">
             <div className="flex items-center gap-3 mb-2">
               <TrendingUp className="w-5 h-5 text-green-400" />
-              <span className="text-sm text-gray-400">Total Volume</span>
+              <span className="text-sm text-gray-400">Updates</span>
             </div>
             <div className="text-2xl font-bold text-white">
-              ${tokensArray.reduce((sum, t) => sum + t.volume24h, 0).toLocaleString()}
+              {updateTrigger}
             </div>
-            <div className="text-xs text-green-400">24h volume</div>
+            <div className="text-xs text-green-400">Live trigger</div>
           </Card>
         </div>
 
