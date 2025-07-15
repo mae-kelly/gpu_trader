@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpu-swarm-trader
+  namespace: gpu-swarm-trader
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: gpu-swarm-trader
+  template:
+    metadata:
+      labels:
+        app: gpu-swarm-trader
+    spec:
+      containers:
+      - name: app
+        image: gpu-swarm-trader:latest
+        ports:
+        - containerPort: 3000
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secrets
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpu-swarm-trader-service
+  namespace: gpu-swarm-trader
+spec:
+  selector:
+    app: gpu-swarm-trader
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+  - name: websocket
+    port: 8080
+    targetPort: 8080
+  type: LoadBalancer

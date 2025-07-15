@@ -1,0 +1,177 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  passwordHash String
+  role        UserRole @default(USER)
+  isActive    Boolean  @default(true)
+  apiKeyHash  String?
+  createdAt   DateTime @default(now())
+  lastLogin   DateTime?
+  updatedAt   DateTime @updatedAt
+
+  tokens      Token[]
+  trades      Trade[]
+  watchlist   WatchlistItem[]
+  preferences UserPreferences?
+
+  @@map("users")
+}
+
+model Token {
+  id              String   @id @default(cuid())
+  address         String
+  symbol          String
+  name            String
+  chain           String
+  price           Float
+  priceChange24h  Float
+  volume24h       Float
+  liquidity       Float
+  marketCap       Float
+  isHoneypot      Boolean  @default(false)
+  riskLevel       RiskLevel @default(UNKNOWN)
+  lastUpdate      DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  trades        Trade[]
+  watchlistItems WatchlistItem[]
+  priceHistory   PriceHistory[]
+  analysis       TokenAnalysis[]
+
+  @@unique([address, chain])
+  @@map("tokens")
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  tokenId   String
+  price     Float
+  volume    Float
+  timestamp DateTime @default(now())
+
+  token Token @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@map("price_history")
+}
+
+model Trade {
+  id          String      @id @default(cuid())
+  userId      String
+  tokenId     String
+  type        TradeType
+  amount      Float
+  price       Float
+  status      TradeStatus @default(PENDING)
+  roi         Float?
+  executedAt  DateTime?
+  createdAt   DateTime    @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token Token @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@map("trades")
+}
+
+model WatchlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenId   String
+  addedAt   DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token Token @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tokenId])
+  @@map("watchlist_items")
+}
+
+model TokenAnalysis {
+  id                    String   @id @default(cuid())
+  tokenId               String
+  buyScore              Float
+  riskLevel             RiskLevel
+  expectedProfitPercent Float
+  optimalHoldHours      Float
+  marketMaturity        String
+  liquidityRatio        Float
+  advice                String[]
+  analysisTimestamp     DateTime @default(now())
+
+  token Token @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@map("token_analysis")
+}
+
+model UserPreferences {
+  id               String @id @default(cuid())
+  userId           String @unique
+  riskTolerance    String @default("medium")
+  timeHorizon      String @default("medium")
+  investmentSize   String @default("small")
+  notifications    Boolean @default(true)
+  autoTrading      Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  resource  String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  timestamp DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model SystemMetrics {
+  id                String   @id @default(cuid())
+  activeUsers       Int
+  totalTrades       Int
+  totalVolume       Float
+  activeTokens      Int
+  systemHealth      String
+  responseTime      Float
+  timestamp         DateTime @default(now())
+
+  @@map("system_metrics")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum TradeType {
+  BUY
+  SELL
+}
+
+enum TradeStatus {
+  PENDING
+  EXECUTED
+  CANCELLED
+  FAILED
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+  UNKNOWN
+}
