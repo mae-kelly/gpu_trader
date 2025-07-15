@@ -10,4 +10,5 @@ const nextConfig = {
     domains: ['api.dexscreener.com']
   }
 }
+
 module.exports = nextConfig

@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @layer base {
   :root {
     --background: 0 0% 3.9%;
@@ -25,6 +26,7 @@
     --radius: 0.75rem;
   }
 }
+
 @layer base {
   * {
     @apply border-border;
@@ -34,6 +36,7 @@
     font-family: system-ui, -apple-system, sans-serif;
   }
 }
+
 @layer components {
   .dashboard-card {
     @apply bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl shadow-lg;
