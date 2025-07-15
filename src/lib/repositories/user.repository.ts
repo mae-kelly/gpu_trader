@@ -7,33 +7,19 @@ export class UserRepository {
     role?: 'USER' | 'ADMIN'
   }) {
     return prisma.user.create({
-      data: {
-        ...data,
-        preferences: {
-          create: {}
-        }
-      },
-      include: {
-        preferences: true
-      }
+      data
     })
   }
 
   async findByEmail(email: string) {
     return prisma.user.findUnique({
-      where: { email },
-      include: {
-        preferences: true
-      }
+      where: { email }
     })
   }
 
   async findById(id: string) {
     return prisma.user.findUnique({
-      where: { id },
-      include: {
-        preferences: true
-      }
+      where: { id }
     })
   }
 

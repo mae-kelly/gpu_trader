@@ -2,18 +2,15 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex')
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || crypto.randomBytes(64).toString('hex')
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-in-production'
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret-change-in-production'
 
 interface User {
   id: string
   email: string
   passwordHash: string
-  role: 'user' | 'admin'
+  role: 'USER' | 'ADMIN'
   isActive: boolean
-  apiKeyHash?: string
-  createdAt: Date
-  lastLogin?: Date
 }
 
 export class AuthService {
@@ -38,15 +35,7 @@ export class AuthService {
     return jwt.verify(token, secret) as { userId: string; type: string }
   }
 
-  generateApiKey(): string {
-    return 'gpuswarm_' + crypto.randomBytes(32).toString('hex')
-  }
-
-  async hashApiKey(apiKey: string): Promise<string> {
-    return crypto.createHash('sha256').update(apiKey).digest('hex')
-  }
-
-  async createUser(email: string, password: string, role: 'user' | 'admin' = 'user'): Promise<User> {
+  async createUser(email: string, password: string, role: 'USER' | 'ADMIN' = 'USER'): Promise<User> {
     const id = crypto.randomUUID()
     const passwordHash = await this.hashPassword(password)
     const user: User = {
@@ -54,8 +43,7 @@ export class AuthService {
       email,
       passwordHash,
       role,
-      isActive: true,
-      createdAt: new Date()
+      isActive: true
     }
     this.users.set(id, user)
     return user
@@ -68,13 +56,23 @@ export class AuthService {
     const isValid = await this.verifyPassword(password, user.passwordHash)
     if (!isValid) return null
     
-    user.lastLogin = new Date()
     return user
   }
 
-  getUser(id: string): User | null {
+  async findUserById(id: string): Promise<User | null> {
     return this.users.get(id) || null
+  }
+
+  async findUserByEmail(email: string): Promise<User | null> {
+    return Array.from(this.users.values()).find(u => u.email === email) || null
+  }
+
+  generateApiKey(): string {
+    return 'gst_' + crypto.randomBytes(32).toString('hex')
   }
 }
 
 export const authService = new AuthService()
+
+// Create default admin user
+authService.createUser('admin@gpuswarm.com', 'ChangeThisPassword123!', 'ADMIN')
