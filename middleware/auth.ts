@@ -1,43 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
-import { rateLimit } from './rate-limit'
-import { userRepository } from '@/lib/repositories/user.repository'
+import { createRateLimit } from './rate-limit'
 
 interface User {
   id: string
   email: string
-  role: 'USER' | 'ADMIN'
+  role: string
 }
 
-export function withAuth(handler: (req: NextRequest, user: User) => Promise<NextResponse>) {
-  return async (req: NextRequest) => {
-    try {
-      // Apply rate limiting first
-      const rateLimitResult = await rateLimit(100, 60000)(req)
-      if (rateLimitResult) return rateLimitResult
+const authRateLimit = createRateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 50 // limit each IP to 50 auth requests per windowMs
+})
 
-      // Extract token from Authorization header
-      const authHeader = req.headers.get('authorization')
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return NextResponse.json({ error: 'Missing or invalid authorization header' }, { status: 401 })
-      }
-
-      const token = authHeader.substring(7)
-      
-      // Verify JWT token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
-      
-      // Get user from database
-      const user = await userRepository.findById(decoded.userId)
-      if (!user || !user.isActive) {
-        return NextResponse.json({ error: 'User not found or inactive' }, { status: 401 })
-      }
-
-      // Call the actual handler with authenticated user
-      return handler(req, user)
-    } catch (error) {
-      console.error('Authentication error:', error)
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
-    }
+export async function authenticateToken(request: NextRequest) {
+  // Apply rate limiting first
+  const rateLimitResult = await authRateLimit(request)
+  if (rateLimitResult) {
+    return rateLimitResult
   }
+
+  const token = request.headers.get('authorization')?.replace('Bearer ', '')
+  
+  if (!token) {
+    return NextResponse.json({ error: 'Access token required' }, { status: 401 })
+  }
+  
+  try {
+    const secret = process.env.JWT_SECRET || 'fallback-secret-change-in-production'
+    const decoded = jwt.verify(token, secret) as { userId: string; email: string; role: string }
+    
+    // Add user info to request headers for the API route
+    const response = NextResponse.next()
+    response.headers.set('x-user-id', decoded.userId || '')
+    response.headers.set('x-user-email', decoded.email || '')
+    response.headers.set('x-user-role', decoded.role || 'user')
+    
+    return response
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid or expired token' }, { status: 403 })
+  }
+}
+
+// Helper function to extract user from request headers (for use in API routes)
+export function getUserFromRequest(request: NextRequest): User | null {
+  const userId = request.headers.get('x-user-id')
+  const email = request.headers.get('x-user-email')
+  const role = request.headers.get('x-user-role')
+  
+  if (!userId || !email) {
+    return null
+  }
+  
+  return { id: userId, email, role: role || 'user' }
 }

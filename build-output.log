@@ -1,0 +1,24 @@
+
+> crypto-trading-dashboard@0.1.0 build
+> next build
+
+ [33m[1m⚠[22m[39m You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+  [1m[38;2;173;127;168m▲ Next.js 14.2.30[39m[22m
+  - Environments: .env.local, .env.production, .env
+
+ [37m[1m [22m[39m Creating an optimized production build ...
+ [32m[1m✓[22m[39m Compiled successfully
+ [37m[1m [22m[39m Linting and checking validity of types ...
+[31mFailed to compile.
+[39m
+[36m./src/components/dashboard/enhanced-realtime-table.tsx[39m:[33m142[39m:[33m50[39m
+[31m[1mType error[22m[39m: Expected 1 arguments, but got 2.
+
+[0m [90m 140 |[39m                   [0m
+[0m [90m 141 |[39m                   [33m<[39m[33mtd[39m className[33m=[39m[32m"p-3 font-mono text-sm text-white"[39m[33m>[39m[0m
+[0m[31m[1m>[22m[39m[90m 142 |[39m                     {formatCurrency(token[33m.[39mprice[33m,[39m [35m6[39m)}[0m
+[0m [90m     |[39m                                                  [31m[1m^[22m[39m[0m
+[0m [90m 143 |[39m                   [33m<[39m[33m/[39m[33mtd[39m[33m>[39m[0m
+[0m [90m 144 |[39m                   [0m
+[0m [90m 145 |[39m                   [33m<[39m[33mtd[39m className[33m=[39m[32m"p-3 text-white"[39m[33m>[39m[0m
+Next.js build worker exited with code: 1 and signal: null

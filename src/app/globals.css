@@ -2,61 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
   :root {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 142.1 70.6% 45.3%;
-    --primary-foreground: 144.9 80.4% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 142.1 70.6% 45.3%;
-    --radius: 0.75rem;
+    --background: #0a0a0a;
+    --foreground: #ededed;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-family: system-ui, -apple-system, sans-serif;
-  }
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-@layer components {
-  .dashboard-card {
-    @apply bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl shadow-lg;
-  }
-  .metric-card {
-    @apply dashboard-card p-6 hover:bg-card/70 transition-colors;
-  }
-  .trading-button-buy {
-    @apply px-4 py-2 rounded-md font-medium bg-green-600 hover:bg-green-700 text-white transition-all duration-200;
-  }
-  .trading-button-sell {
-    @apply px-4 py-2 rounded-md font-medium bg-red-600 hover:bg-red-700 text-white transition-all duration-200;
-  }
-  .table-hover {
-    @apply hover:bg-muted/50 transition-colors cursor-pointer;
-  }
-  .gradient-text {
-    @apply bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 bg-clip-text text-transparent;
-  }
-  .status-online {
-    @apply text-green-400 animate-pulse;
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 }

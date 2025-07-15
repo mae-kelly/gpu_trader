@@ -1,0 +1,217 @@
+TypeScript Error Analysis - Tue Jul 15 04:19:03 EDT 2025
+=======================================
+
+📋 This will show ALL type errors, not just the first one...
+
+🔧 Method 1: Running TypeScript compiler check...
+================================================
+✅ No TypeScript compiler errors found
+
+🔧 Method 2: Running Next.js build with detailed output...
+========================================================
+
+> crypto-trading-dashboard@0.1.0 build
+> next build
+
+ [33m[1m⚠[22m[39m You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+  [1m[38;2;173;127;168m▲ Next.js 14.2.30[39m[22m
+  - Environments: .env.local, .env.production, .env
+
+ [37m[1m [22m[39m Creating an optimized production build ...
+ [32m[1m✓[22m[39m Compiled successfully
+ [37m[1m [22m[39m Linting and checking validity of types ...
+[31mFailed to compile.
+[39m
+[36m./src/components/dashboard/enhanced-realtime-table.tsx[39m:[33m142[39m:[33m50[39m
+[31m[1mType error[22m[39m: Expected 1 arguments, but got 2.
+
+[0m [90m 140 |[39m                   [0m
+[0m [90m 141 |[39m                   [33m<[39m[33mtd[39m className[33m=[39m[32m"p-3 font-mono text-sm text-white"[39m[33m>[39m[0m
+[0m[31m[1m>[22m[39m[90m 142 |[39m                     {formatCurrency(token[33m.[39mprice[33m,[39m [35m6[39m)}[0m
+[0m [90m     |[39m                                                  [31m[1m^[22m[39m[0m
+[0m [90m 143 |[39m                   [33m<[39m[33m/[39m[33mtd[39m[33m>[39m[0m
+[0m [90m 144 |[39m                   [0m
+[0m [90m 145 |[39m                   [33m<[39m[33mtd[39m className[33m=[39m[32m"p-3 text-white"[39m[33m>[39m[0m
+Next.js build worker exited with code: 1 and signal: null
+
+🔧 Method 3: Extracting all type errors from build...
+====================================================
+📝 All Type Errors Found:
+========================
+
+📝 All Module Not Found Errors:
+===============================
+
+📝 All Import/Export Errors:
+============================
+
+📊 Error Summary:
+================
+🔢 Type errors: 0
+0
+🔢 Module not found: 0
+0
+🔢 Import/export errors: 0
+0
+🔢 Total errors: 
+
+💡 All errors captured for comprehensive fixing!
+
+🔧 Method 4: Quick file-by-file check...
+========================================
+📁 Checking common problem files:
+🔍 src/app/dashboard/page.tsx:
+   ❌ Has TypeScript errors:
+      src/app/dashboard/page.tsx(4,35): error TS2307: Cannot find module '@/components/dashboard/realtime-momentum-table' or its corresponding type declarations.
+      src/app/dashboard/page.tsx(5,34): error TS2307: Cannot find module '@/lib/realtime-store' or its corresponding type declarations.
+      src/app/dashboard/page.tsx(6,22): error TS2307: Cannot find module '@/components/ui/card' or its corresponding type declarations.
+      src/app/dashboard/page.tsx(7,23): error TS2307: Cannot find module '@/components/ui/badge' or its corresponding type declarations.
+      src/app/dashboard/page.tsx(23,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/app/dashboard/page.tsx(24,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/app/dashboard/page.tsx(26,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/app/dashboard/page.tsx(27,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/app/dashboard/page.tsx(28,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/app/dashboard/page.tsx(31,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+
+🔍 src/components/dashboard/enhanced-realtime-table.tsx:
+   ❌ Has TypeScript errors:
+      src/components/dashboard/enhanced-realtime-table.tsx(4,22): error TS2307: Cannot find module '@/components/ui/card' or its corresponding type declarations.
+      src/components/dashboard/enhanced-realtime-table.tsx(5,24): error TS2307: Cannot find module '@/components/ui/button' or its corresponding type declarations.
+      src/components/dashboard/enhanced-realtime-table.tsx(6,34): error TS2307: Cannot find module '@/lib/realtime-store' or its corresponding type declarations.
+      src/components/dashboard/enhanced-realtime-table.tsx(8,50): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+      src/components/dashboard/enhanced-realtime-table.tsx(9,30): error TS6142: Module '../token-details/token-detail-modal' was resolved to '/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/src/components/token-details/token-detail-modal.tsx', but '--jsx' is not set.
+      src/components/dashboard/enhanced-realtime-table.tsx(10,32): error TS2307: Cannot find module '@/lib/ml-learning' or its corresponding type declarations.
+      src/components/dashboard/enhanced-realtime-table.tsx(63,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/components/dashboard/enhanced-realtime-table.tsx(64,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/components/dashboard/enhanced-realtime-table.tsx(65,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/components/dashboard/enhanced-realtime-table.tsx(66,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+
+🔍 src/components/dashboard/realtime-momentum-table.tsx:
+   ❌ Has TypeScript errors:
+      src/components/dashboard/realtime-momentum-table.tsx(4,22): error TS2307: Cannot find module '@/components/ui/card' or its corresponding type declarations.
+      src/components/dashboard/realtime-momentum-table.tsx(5,24): error TS2307: Cannot find module '@/components/ui/button' or its corresponding type declarations.
+      src/components/dashboard/realtime-momentum-table.tsx(6,34): error TS2307: Cannot find module '@/lib/realtime-store' or its corresponding type declarations.
+      src/components/dashboard/realtime-momentum-table.tsx(8,50): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+      src/components/dashboard/realtime-momentum-table.tsx(46,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/components/dashboard/realtime-momentum-table.tsx(47,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/components/dashboard/realtime-momentum-table.tsx(48,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/components/dashboard/realtime-momentum-table.tsx(49,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/components/dashboard/realtime-momentum-table.tsx(50,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+      src/components/dashboard/realtime-momentum-table.tsx(53,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+
+🔍 src/lib/realtime-store.ts:
+   ✅ No obvious TypeScript errors
+
+🔍 middleware/auth.ts:
+   ❌ Has TypeScript errors:
+      middleware/auth.ts(2,8): error TS1192: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/jsonwebtoken/index"' has no default export.
+      node_modules/next/dist/build/templates/app-page.d.ts(10,40): error TS2307: Cannot find module 'VAR_MODULE_GLOBAL_ERROR' or its corresponding type declarations.
+      node_modules/next/dist/build/webpack-config.d.ts(11,104): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'RuleSetUseItem'.
+      node_modules/next/dist/build/webpack/loaders/next-app-loader.d.ts(1,13): error TS2613: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' has no default export. Did you mean to use 'import { webpack } from "/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' instead?
+      node_modules/next/dist/build/webpack/plugins/define-env-plugin.d.ts(26,86): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'DefinePlugin'.
+      node_modules/next/dist/client/components/error-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/layout-router.d.ts(3,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/not-found-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/with-router.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/server/app-render/entry-base.d.ts(1,85): error TS2307: Cannot find module 'react-server-dom-webpack/server.edge' or its corresponding type declarations.
+
+🔍 middleware/rate-limit.ts:
+   ❌ Has TypeScript errors:
+      node_modules/next/dist/build/templates/app-page.d.ts(10,40): error TS2307: Cannot find module 'VAR_MODULE_GLOBAL_ERROR' or its corresponding type declarations.
+      node_modules/next/dist/build/webpack-config.d.ts(11,104): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'RuleSetUseItem'.
+      node_modules/next/dist/build/webpack/loaders/next-app-loader.d.ts(1,13): error TS2613: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' has no default export. Did you mean to use 'import { webpack } from "/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' instead?
+      node_modules/next/dist/build/webpack/plugins/define-env-plugin.d.ts(26,86): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'DefinePlugin'.
+      node_modules/next/dist/client/components/error-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/layout-router.d.ts(3,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/not-found-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/with-router.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/server/app-render/entry-base.d.ts(1,85): error TS2307: Cannot find module 'react-server-dom-webpack/server.edge' or its corresponding type declarations.
+      node_modules/next/dist/server/render.d.ts(17,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+
+🔍 middleware/security.ts:
+   ❌ Has TypeScript errors:
+      node_modules/next/dist/build/templates/app-page.d.ts(10,40): error TS2307: Cannot find module 'VAR_MODULE_GLOBAL_ERROR' or its corresponding type declarations.
+      node_modules/next/dist/build/webpack-config.d.ts(11,104): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'RuleSetUseItem'.
+      node_modules/next/dist/build/webpack/loaders/next-app-loader.d.ts(1,13): error TS2613: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' has no default export. Did you mean to use 'import { webpack } from "/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' instead?
+      node_modules/next/dist/build/webpack/plugins/define-env-plugin.d.ts(26,86): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'DefinePlugin'.
+      node_modules/next/dist/client/components/error-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/layout-router.d.ts(3,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/not-found-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/with-router.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/server/app-render/entry-base.d.ts(1,85): error TS2307: Cannot find module 'react-server-dom-webpack/server.edge' or its corresponding type declarations.
+      node_modules/next/dist/server/render.d.ts(17,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+
+🔍 src/middleware/auth.ts:
+   ❌ Has TypeScript errors:
+      node_modules/next/dist/build/templates/app-page.d.ts(10,40): error TS2307: Cannot find module 'VAR_MODULE_GLOBAL_ERROR' or its corresponding type declarations.
+      node_modules/next/dist/build/webpack-config.d.ts(11,104): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'RuleSetUseItem'.
+      node_modules/next/dist/build/webpack/loaders/next-app-loader.d.ts(1,13): error TS2613: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' has no default export. Did you mean to use 'import { webpack } from "/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' instead?
+      node_modules/next/dist/build/webpack/plugins/define-env-plugin.d.ts(26,86): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'DefinePlugin'.
+      node_modules/next/dist/client/components/error-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/layout-router.d.ts(3,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/not-found-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/with-router.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/server/app-render/entry-base.d.ts(1,85): error TS2307: Cannot find module 'react-server-dom-webpack/server.edge' or its corresponding type declarations.
+      node_modules/next/dist/server/render.d.ts(17,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+
+🔍 src/middleware/rate-limit.ts:
+   ❌ Has TypeScript errors:
+      node_modules/next/dist/build/templates/app-page.d.ts(10,40): error TS2307: Cannot find module 'VAR_MODULE_GLOBAL_ERROR' or its corresponding type declarations.
+      node_modules/next/dist/build/webpack-config.d.ts(11,104): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'RuleSetUseItem'.
+      node_modules/next/dist/build/webpack/loaders/next-app-loader.d.ts(1,13): error TS2613: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' has no default export. Did you mean to use 'import { webpack } from "/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' instead?
+      node_modules/next/dist/build/webpack/plugins/define-env-plugin.d.ts(26,86): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'DefinePlugin'.
+      node_modules/next/dist/client/components/error-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/layout-router.d.ts(3,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/not-found-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/with-router.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/server/app-render/entry-base.d.ts(1,85): error TS2307: Cannot find module 'react-server-dom-webpack/server.edge' or its corresponding type declarations.
+      node_modules/next/dist/server/render.d.ts(17,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+
+🔍 src/middleware/security.ts:
+   ❌ Has TypeScript errors:
+      node_modules/next/dist/build/templates/app-page.d.ts(10,40): error TS2307: Cannot find module 'VAR_MODULE_GLOBAL_ERROR' or its corresponding type declarations.
+      node_modules/next/dist/build/webpack-config.d.ts(11,104): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'RuleSetUseItem'.
+      node_modules/next/dist/build/webpack/loaders/next-app-loader.d.ts(1,13): error TS2613: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' has no default export. Did you mean to use 'import { webpack } from "/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack"' instead?
+      node_modules/next/dist/build/webpack/plugins/define-env-plugin.d.ts(26,86): error TS2694: Namespace '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/next/dist/compiled/webpack/webpack".webpack' has no exported member 'DefinePlugin'.
+      node_modules/next/dist/client/components/error-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/layout-router.d.ts(3,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/components/not-found-boundary.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/client/with-router.d.ts(1,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+      node_modules/next/dist/server/app-render/entry-base.d.ts(1,85): error TS2307: Cannot find module 'react-server-dom-webpack/server.edge' or its corresponding type declarations.
+      node_modules/next/dist/server/render.d.ts(17,8): error TS1259: Module '"/Users/maevekelly/Downloads/crypto-app/crypto-trading-dashboard/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+
+
+🔍 Method 5: Finding all .tsx and .ts files with potential issues...
+===================================================================
+📁 Checking TypeScript files in src/:
+❌ src/middleware/security.ts: 20 errors
+❌ src/middleware/rate-limit.ts: 20 errors
+❌ src/middleware/auth.ts: 21 errors
+✅ src/types/crypto.ts: No errors
+✅ src/types/index.ts: No errors
+❌ src/app/dashboard/page.tsx: 39 errors
+❌ src/app/coin/[id]/page.tsx: 90 errors
+❌ src/app/layout.tsx: 31 errors
+❌ src/app/api/metrics/route.ts: 20 errors
+❌ src/app/api/auth/register/route.ts: 23 errors
+❌ src/app/api/auth/login/route.ts: 24 errors
+❌ src/app/api/health/route.ts: 21 errors
+❌ src/app/api/tokens/[address]/route.ts: 20 errors
+❌ src/app/api/tokens/route.ts: 20 errors
+❌ src/app/page.tsx: 39 errors
+❌ src/components/ui/card.tsx: 2 errors
+❌ src/components/ui/badge.tsx: 2 errors
+❌ src/components/ui/table.tsx: 8 errors
+❌ src/components/ui/acceleration-meter.tsx: 5 errors
+❌ src/components/ui/button.tsx: 2 errors
+
+🎯 Analysis Complete!
+====================
+📄 Full analysis saved to: typescript-errors-20250715-041903.log
+🔍 Review the file contents for all error details
+💡 Share this file for comprehensive error fixing!
+
+📋 Next steps:
+1. Review the errors in typescript-errors-20250715-041903.log
+2. Share the file contents
+3. Get a single comprehensive fix for ALL issues

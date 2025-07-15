@@ -1,17 +1,29 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-export function securityHeaders(response: NextResponse): NextResponse {
+export function securityHeaders(request: NextRequest) {
+  const response = NextResponse.next()
+  
+  // Security headers
   response.headers.set('X-Content-Type-Options', 'nosniff')
   response.headers.set('X-Frame-Options', 'DENY')
   response.headers.set('X-XSS-Protection', '1; mode=block')
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
   
-  if (process.env.NODE_ENV === 'production') {
-    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+  // CORS headers for API routes
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    response.headers.set('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGINS || '*')
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   }
   
   return response
 }
 
-export function rateLimit() {
-  return async () => null // Simplified for now
+export function validateInput(data: any, schema: any) {
+  // Simple validation - in a real app you'd use Joi or Zod
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid input data')
+  }
+  return data
 }

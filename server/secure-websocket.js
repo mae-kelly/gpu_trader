@@ -1,64 +1,93 @@
 const WebSocket = require('ws')
+const https = require('https')
+const fs = require('fs')
+const path = require('path')
 
 class SecureWebSocketServer {
-  constructor() {
-    this.clients = new Map()
+  constructor(port = 8080) {
+    this.port = port
+    this.wss = null
   }
 
-  start(port = 8080) {
+  start() {
     console.log('🚀 Starting WebSocket server...')
     
-    this.wss = new WebSocket.Server({ port })
-
-    this.wss.on('connection', this.handleConnection.bind(this))
-    console.log(`🔒 WebSocket server running on port ${port}`)
-  }
-
-  handleConnection(ws, req) {
-    const clientId = Math.random().toString(36).substr(2, 9)
-    console.log(`🔗 Client connected: ${clientId}`)
-    
-    this.clients.set(ws, { 
-      id: clientId, 
-      connectedAt: Date.now()
+    // Create WebSocket server directly on the port
+    this.wss = new WebSocket.Server({ 
+      port: this.port,
+      perMessageDeflate: false
     })
 
-    ws.on('close', () => {
-      this.clients.delete(ws)
-      console.log(`🔌 Client disconnected: ${clientId}`)
+    this.wss.on('connection', (ws, request) => {
+      console.log('🔗 New WebSocket connection from:', request.socket.remoteAddress)
+      
+      ws.on('message', (message) => {
+        try {
+          const data = JSON.parse(message.toString())
+          console.log('📨 Received:', data)
+          
+          // Echo back for now
+          ws.send(JSON.stringify({
+            type: 'response',
+            data: data,
+            timestamp: new Date().toISOString()
+          }))
+        } catch (error) {
+          console.error('❌ Error processing message:', error)
+          ws.send(JSON.stringify({
+            type: 'error',
+            message: 'Invalid message format'
+          }))
+        }
+      })
+
+      ws.on('close', () => {
+        console.log('🔌 WebSocket connection closed')
+      })
+
+      ws.on('error', (error) => {
+        console.error('❌ WebSocket error:', error)
+      })
+
+      // Send welcome message
+      ws.send(JSON.stringify({
+        type: 'welcome',
+        message: 'Connected to secure WebSocket server',
+        timestamp: new Date().toISOString()
+      }))
     })
 
-    ws.on('error', (error) => {
-      console.error(`WebSocket error for ${clientId}:`, error.message)
-      this.clients.delete(ws)
+    this.wss.on('error', (error) => {
+      console.error('❌ WebSocket server error:', error)
     })
 
-    // Send welcome message
-    ws.send(JSON.stringify({
-      type: 'connected',
-      message: 'Connection established',
-      clientId,
-      timestamp: Date.now()
-    }))
+    console.log(`🔒 WebSocket server running on port ${this.port}`)
   }
 
   stop() {
-    console.log('🛑 Stopping WebSocket server...')
     if (this.wss) {
       this.wss.close()
+      console.log('🛑 WebSocket server stopped')
     }
-    this.clients.clear()
   }
 }
 
-module.exports = { SecureWebSocketServer }
-
-// Start server if run directly
+// Start server if this file is run directly
 if (require.main === module) {
-  const server = new SecureWebSocketServer()
-  server.start(process.env.WS_PORT || 8080)
-  
-  // Graceful shutdown
-  process.on('SIGTERM', () => server.stop())
-  process.on('SIGINT', () => server.stop())
+  const server = new SecureWebSocketServer(8080)
+  server.start()
+
+  process.on('SIGTERM', () => {
+    console.log('🛑 Received SIGTERM, shutting down gracefully')
+    server.stop()
+    process.exit(0)
+  })
+
+  process.on('SIGINT', () => {
+    console.log('🛑 Received SIGINT, shutting down gracefully')
+    server.stop()
+    process.exit(0)
+  })
 }
+
+module.exports = SecureWebSocketServer

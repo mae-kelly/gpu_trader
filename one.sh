@@ -1,349 +1,179 @@
 #!/bin/bash
 
-echo "🔧 Complete Fix for Tailwind CSS and Build Issues"
-echo "================================================="
+echo "🔍 Checking ALL TypeScript Errors"
+echo "================================="
 
-# 1. Stop any running processes
-echo "🛑 Stopping any running processes..."
-pkill -f "next dev" || true
-pkill -f "secure-websocket" || true
+# Create output file with timestamp
+OUTPUT_FILE="typescript-errors-$(date +%Y%m%d-%H%M%S).log"
 
-# 2. Clean everything
-echo "🧹 Cleaning build artifacts and cache..."
-rm -rf .next
-rm -rf node_modules
-rm -f package-lock.json
-rm -rf .npm
-npm cache clean --force
-
-# 3. Fix PostCSS configuration
-echo "📝 Creating correct PostCSS configuration..."
-cat > postcss.config.js << 'EOF'
-module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-}
-EOF
-
-# 4. Fix Next.js configuration
-echo "📝 Updating Next.js configuration..."
-cat > next.config.js << 'EOF'
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-  env: {
-    CUSTOM_KEY: process.env.NODE_ENV || 'development',
-    BIRDEYE_API_KEY: process.env.BIRDEYE_API_KEY || ''
-  },
-  images: {
-    domains: ['api.dexscreener.com']
-  }
+# Function to both echo and write to file
+log_and_echo() {
+    echo "$1"
+    echo "$1" >> "$OUTPUT_FILE"
 }
 
-module.exports = nextConfig
-EOF
+# Start fresh output file
+echo "TypeScript Error Analysis - $(date)" > "$OUTPUT_FILE"
+echo "=======================================" >> "$OUTPUT_FILE"
+echo "" >> "$OUTPUT_FILE"
 
-# 5. Fix Tailwind configuration
-echo "📝 Updating Tailwind configuration..."
-cat > tailwind.config.js << 'EOF'
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
-  theme: {
-    extend: {
-      colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-      },
-      animation: {
-        "fade-in": "fadeIn 0.5s ease-in-out",
-        "slide-up": "slideUp 0.3s ease-out",
-      },
-    },
-  },
-  plugins: [],
-}
-EOF
+log_and_echo "📋 This will show ALL type errors, not just the first one..."
+log_and_echo ""
 
-# 6. Create missing middleware directory and files
-echo "📁 Creating missing middleware files..."
-mkdir -p src/middleware
-
-# Create auth middleware
-cat > src/middleware/auth.ts << 'EOF'
-import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
-
-interface User {
-  id: string
-  email: string
-  role: 'USER' | 'ADMIN'
-}
-
-export function withAuth(handler: (req: NextRequest, user: User) => Promise<NextResponse>) {
-  return async (req: NextRequest) => {
-    try {
-      const authHeader = req.headers.get('authorization')
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return NextResponse.json({ error: 'Missing authorization header' }, { status: 401 })
-      }
-
-      const token = authHeader.substring(7)
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any
-      
-      const user: User = {
-        id: decoded.userId,
-        email: decoded.email || 'unknown',
-        role: decoded.role || 'USER'
-      }
-
-      return handler(req, user)
-    } catch (error) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
-    }
-  }
-}
-EOF
-
-# Create security middleware
-cat > src/middleware/security.ts << 'EOF'
-import { NextResponse } from 'next/server'
-
-export function securityHeaders(response: NextResponse): NextResponse {
-  response.headers.set('X-Content-Type-Options', 'nosniff')
-  response.headers.set('X-Frame-Options', 'DENY')
-  response.headers.set('X-XSS-Protection', '1; mode=block')
-  
-  if (process.env.NODE_ENV === 'production') {
-    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
-  }
-  
-  return response
-}
-
-export function rateLimit() {
-  return async () => null // Simplified for now
-}
-EOF
-
-# 7. Fix API routes to use correct imports
-echo "📝 Fixing API route imports..."
-
-# Fix metrics route
-cat > src/app/api/metrics/route.ts << 'EOF'
-import { NextRequest, NextResponse } from 'next/server'
-
-export async function GET(req: NextRequest) {
-  try {
-    const metrics = {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      tokens: 0,
-      connections: 0
-    }
-    
-    return NextResponse.json(metrics)
-  } catch (error) {
-    return NextResponse.json({
-      error: 'Failed to fetch metrics'
-    }, { status: 500 })
-  }
-}
-EOF
-
-# Fix tokens route
-cat > src/app/api/tokens/route.ts << 'EOF'
-import { NextRequest, NextResponse } from 'next/server'
-
-export async function GET(req: NextRequest) {
-  try {
-    const tokens = [] // Placeholder for now
-    
-    return NextResponse.json({
-      success: true,
-      data: tokens,
-      count: tokens.length,
-      timestamp: Date.now()
-    })
-  } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to fetch tokens'
-    }, { status: 500 })
-  }
-}
-EOF
-
-# Fix token address route
-cat > src/app/api/tokens/[address]/route.ts << 'EOF'
-import { NextRequest, NextResponse } from 'next/server'
-
-export async function GET(
-  req: NextRequest, 
-  { params }: { params: { address: string } }
-) {
-  try {
-    const { address } = params
-    
-    // Placeholder response
-    const token = {
-      address,
-      symbol: 'TOKEN',
-      name: 'Sample Token',
-      price: 0,
-      priceChange24h: 0
-    }
-    
-    return NextResponse.json({
-      success: true,
-      data: token
-    })
-  } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to fetch token details'
-    }, { status: 500 })
-  }
-}
-EOF
-
-# 8. Fix WebSocket server configuration
-echo "🔒 Fixing WebSocket server..."
-cat > server/secure-websocket.js << 'EOF'
-const WebSocket = require('ws')
-
-class SecureWebSocketServer {
-  constructor() {
-    this.clients = new Map()
-  }
-
-  start(port = 8080) {
-    console.log('🚀 Starting WebSocket server...')
-    
-    this.wss = new WebSocket.Server({ port })
-
-    this.wss.on('connection', this.handleConnection.bind(this))
-    console.log(`🔒 WebSocket server running on port ${port}`)
-  }
-
-  handleConnection(ws, req) {
-    const clientId = Math.random().toString(36).substr(2, 9)
-    console.log(`🔗 Client connected: ${clientId}`)
-    
-    this.clients.set(ws, { 
-      id: clientId, 
-      connectedAt: Date.now()
-    })
-
-    ws.on('close', () => {
-      this.clients.delete(ws)
-      console.log(`🔌 Client disconnected: ${clientId}`)
-    })
-
-    ws.on('error', (error) => {
-      console.error(`WebSocket error for ${clientId}:`, error.message)
-      this.clients.delete(ws)
-    })
-
-    // Send welcome message
-    ws.send(JSON.stringify({
-      type: 'connected',
-      message: 'Connection established',
-      clientId,
-      timestamp: Date.now()
-    }))
-  }
-
-  stop() {
-    console.log('🛑 Stopping WebSocket server...')
-    if (this.wss) {
-      this.wss.close()
-    }
-    this.clients.clear()
-  }
-}
-
-module.exports = { SecureWebSocketServer }
-
-// Start server if run directly
-if (require.main === module) {
-  const server = new SecureWebSocketServer()
-  server.start(process.env.WS_PORT || 8080)
-  
-  // Graceful shutdown
-  process.on('SIGTERM', () => server.stop())
-  process.on('SIGINT', () => server.stop())
-}
-EOF
-
-# 9. Install correct dependencies
-echo "📦 Installing dependencies with correct versions..."
-npm install
-
-# Install Tailwind and PostCSS with correct versions
-echo "📦 Installing Tailwind CSS..."
-npm install -D tailwindcss@^3.4.0 postcss@^8.4.0 autoprefixer@^10.4.0
-
-# Install required dependencies for API routes
-echo "📦 Installing additional dependencies..."
-npm install jsonwebtoken@^9.0.2 bcryptjs@^3.0.2
-
-# 10. Test the build
-echo "🔨 Testing the build..."
-npm run build
-
-if [ $? -eq 0 ]; then
-    echo "✅ Build successful!"
-    echo ""
-    echo "🚀 You can now run:"
-    echo "   npm run dev"
-    echo ""
-    echo "📡 Or start with WebSocket:"
-    echo "   ./start-secure.sh"
+# Method 1: Use TypeScript compiler directly to see all errors
+log_and_echo "🔧 Method 1: Running TypeScript compiler check..."
+log_and_echo "================================================"
+tsc_output=$(npx tsc --noEmit --pretty --listFiles false 2>&1)
+if echo "$tsc_output" | grep -E "(error TS|Error:|Type error)" > /dev/null; then
+    echo "$tsc_output" | grep -E "(error TS|Error:|Type error)" | while read -r line; do
+        log_and_echo "❌ $line"
+    done
 else
-    echo "❌ Build still failing. Manual intervention needed."
-    echo ""
-    echo "🔍 Try these debugging steps:"
-    echo "1. Check Node.js version: node --version"
-    echo "2. Delete everything and reinstall: rm -rf node_modules package-lock.json && npm install"
-    echo "3. Check for conflicting packages in package.json"
+    log_and_echo "✅ No TypeScript compiler errors found"
 fi
-EOF
+
+log_and_echo ""
+log_and_echo "🔧 Method 2: Running Next.js build with detailed output..."
+log_and_echo "========================================================"
+
+# Method 2: Try to build and capture all errors
+export FORCE_COLOR=0  # Disable colors for cleaner log output
+export NODE_ENV=development
+
+# Build and capture ALL output
+build_output=$(npm run build 2>&1)
+echo "$build_output" >> "$OUTPUT_FILE"
+
+log_and_echo ""
+log_and_echo "🔧 Method 3: Extracting all type errors from build..."
+log_and_echo "===================================================="
+
+# Extract all type errors
+log_and_echo "📝 All Type Errors Found:"
+log_and_echo "========================"
+
+echo "$build_output" | grep -n "Type error:" | while read -r line; do
+    log_and_echo "❌ $line"
+done
+
+log_and_echo ""
+log_and_echo "📝 All Module Not Found Errors:"
+log_and_echo "==============================="
+
+echo "$build_output" | grep -n "Module not found:" | while read -r line; do
+    log_and_echo "❌ $line"
+done
+
+log_and_echo ""
+log_and_echo "📝 All Import/Export Errors:"
+log_and_echo "============================"
+
+echo "$build_output" | grep -n "not exported\|Cannot find\|has no exported member" | while read -r line; do
+    log_and_echo "❌ $line"
+done
+
+log_and_echo ""
+log_and_echo "📊 Error Summary:"
+log_and_echo "================"
+
+type_errors=$(echo "$build_output" | grep -c "Type error:" 2>/dev/null || echo "0")
+module_errors=$(echo "$build_output" | grep -c "Module not found:" 2>/dev/null || echo "0") 
+import_errors=$(echo "$build_output" | grep -c "not exported\|Cannot find\|has no exported member" 2>/dev/null || echo "0")
+
+log_and_echo "🔢 Type errors: $type_errors"
+log_and_echo "🔢 Module not found: $module_errors"
+log_and_echo "🔢 Import/export errors: $import_errors"
+
+total_errors=$((type_errors + module_errors + import_errors))
+log_and_echo "🔢 Total errors: $total_errors"
+
+if [ "$total_errors" -eq 0 ]; then
+    log_and_echo ""
+    log_and_echo "🎉 No errors found! Your build should be successful!"
+else
+    log_and_echo ""
+    log_and_echo "💡 All errors captured for comprehensive fixing!"
+fi
+
+log_and_echo ""
+log_and_echo "🔧 Method 4: Quick file-by-file check..."
+log_and_echo "========================================"
+
+# Check specific files that commonly have issues
+log_and_echo "📁 Checking common problem files:"
+
+problem_files=(
+    "src/app/dashboard/page.tsx"
+    "src/components/dashboard/enhanced-realtime-table.tsx"
+    "src/components/dashboard/realtime-momentum-table.tsx"
+    "src/lib/realtime-store.ts"
+    "middleware/auth.ts"
+    "middleware/rate-limit.ts"
+    "middleware/security.ts"
+    "src/middleware/auth.ts"
+    "src/middleware/rate-limit.ts"
+    "src/middleware/security.ts"
+)
+
+for file in "${problem_files[@]}"; do
+    if [ -f "$file" ]; then
+        log_and_echo "🔍 $file:"
+        # Quick syntax check
+        file_check=$(npx tsc --noEmit "$file" 2>&1)
+        if [ $? -eq 0 ]; then
+            log_and_echo "   ✅ No obvious TypeScript errors"
+        else
+            log_and_echo "   ❌ Has TypeScript errors:"
+            echo "$file_check" | head -10 | while read -r line; do
+                log_and_echo "      $line"
+            done
+        fi
+    else
+        log_and_echo "🔍 $file: ⚠️  File not found"
+    fi
+    log_and_echo ""
+done
+
+log_and_echo ""
+log_and_echo "🔍 Method 5: Finding all .tsx and .ts files with potential issues..."
+log_and_echo "==================================================================="
+
+# Find all TypeScript files and check them
+ts_files=$(find src -name "*.ts" -o -name "*.tsx" | head -20)  # Limit to first 20 to avoid spam
+log_and_echo "📁 Checking TypeScript files in src/:"
+
+for file in $ts_files; do
+    if [ -f "$file" ]; then
+        file_errors=$(npx tsc --noEmit "$file" 2>&1 | grep -c "error TS" || echo "0")
+        if [ "$file_errors" -gt 0 ]; then
+            log_and_echo "❌ $file: $file_errors errors"
+        else
+            log_and_echo "✅ $file: No errors"
+        fi
+    fi
+done
+
+log_and_echo ""
+log_and_echo "🎯 Analysis Complete!"
+log_and_echo "===================="
+log_and_echo "📄 Full analysis saved to: $OUTPUT_FILE"
+log_and_echo "🔍 Review the file contents for all error details"
+log_and_echo "💡 Share this file for comprehensive error fixing!"
+log_and_echo ""
+log_and_echo "📋 Next steps:"
+log_and_echo "1. Review the errors in $OUTPUT_FILE"
+log_and_echo "2. Share the file contents"
+log_and_echo "3. Get a single comprehensive fix for ALL issues"
+
+echo ""
+echo "✅ Complete error analysis saved to: $OUTPUT_FILE"
+echo "📂 File location: $(pwd)/$OUTPUT_FILE"
+echo ""
+echo "🔍 Quick preview of errors found:"
+echo "================================="
+if [ "$total_errors" -gt 0 ]; then
+    echo "❌ Found $total_errors total errors"
+    echo "📄 See $OUTPUT_FILE for complete details"
+else
+    echo "🎉 No errors found!"
+fi
