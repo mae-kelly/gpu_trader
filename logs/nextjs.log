@@ -1,0 +1,21 @@
+
+> crypto-trading-dashboard@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+  ▲ Next.js 14.2.30
+  - Local:        http://localhost:3001
+  - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 1543ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.4s (516 modules)
+ GET / 200 in 2641ms
+ ✓ Compiled in 222ms (248 modules)
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 548ms (291 modules)
+ GET /favicon.ico 200 in 594ms
+ ✓ Compiled /dashboard in 462ms (561 modules)
+ GET / 200 in 78ms
+[?25h

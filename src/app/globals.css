@@ -2,26 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    @apply bg-black text-white;
+  }
+  
+  body {
+    @apply bg-gradient-to-br from-gray-900 via-black to-gray-900;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer components {
+  .trading-card {
+    @apply bg-gradient-to-br from-gray-900/90 to-black/90 border border-gray-700/50 backdrop-blur-xl shadow-2xl rounded-xl;
+  }
+  
+  .profit-text {
+    @apply font-bold text-green-400;
+  }
+  
+  .loss-text {
+    @apply font-bold text-red-400;
+  }
+  
+  .pulse-ring {
+    @apply absolute w-full h-full rounded-full border-2 border-green-400 animate-ping;
   }
 }
