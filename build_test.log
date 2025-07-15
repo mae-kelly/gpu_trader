@@ -1,0 +1,47 @@
+
+> crypto-trading-dashboard@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.30
+  - Environments: .env.local, .env.production, .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/11) ...
+   Generating static pages (2/11) 
+   Generating static pages (5/11) 
+🎨 Table render: {
+  renderKey: 0,
+  isConnected: false,
+  totalTokens: 0,
+  filteredTokens: 0,
+  lastUpdate: '7:00:00 PM'
+}
+   Generating static pages (8/11) 
+ ✓ Generating static pages (11/11)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    1.58 kB        88.8 kB
+├ ○ /_not-found                          873 B          88.1 kB
+├ ƒ /api/auth/login                      0 B                0 B
+├ ƒ /api/auth/register                   0 B                0 B
+├ ○ /api/health                          0 B                0 B
+├ ○ /api/metrics                         0 B                0 B
+├ ○ /api/tokens                          0 B                0 B
+├ ƒ /api/tokens/[address]                0 B                0 B
+├ ƒ /coin/[id]                           100 kB          187 kB
+└ ○ /dashboard                           4.22 kB        91.5 kB
++ First Load JS shared by all            87.2 kB
+  ├ chunks/117-78feffba510973ef.js       31.6 kB
+  ├ chunks/fd9d1056-4770f2c50b019016.js  53.6 kB
+  └ other shared chunks (total)          2 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

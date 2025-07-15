@@ -125,7 +125,7 @@ export default function RealtimeMomentumTable() {
                   </td>
                   
                   <td className="p-3 font-mono text-sm text-white">
-                    {formatCurrency(token.price, 6)}
+                    {formatCurrency(token.price)}
                   </td>
                   
                   <td className="p-3 text-white">
